@@ -4,10 +4,10 @@ extends WStateTreeTask
 
 
 @export var debug_message : String
+@export var debug_color : Color = Color(0.82, 0.82, 0.82)
+
 
 func _start():
 	super()
-	print(self, ": ", debug_message)
-	
-func _process_task(delta : float):
-	super(delta)
+	var color_string : String = "[color=" + debug_color.to_html(false) + "]"
+	print_rich(color_string, get_script().get_global_name(), ": ", debug_message, "[/color]")

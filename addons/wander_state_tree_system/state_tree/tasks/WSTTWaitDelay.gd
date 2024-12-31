@@ -3,10 +3,10 @@ class_name WSTTWaitDelay
 extends WStateTreeTask
 
 
-
 @export var delay : float = 1.0
 
 var timer : SceneTreeTimer = null
+
 
 func _start():
 	super()

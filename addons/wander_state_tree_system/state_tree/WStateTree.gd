@@ -2,6 +2,8 @@ class_name WStateTree
 extends WState
 
 
+@export var self_initialize: bool = false
+
 var state_tree_owner : Node = null
 var target_state : WState = null
 var selected_states : Array[WState] = []
@@ -10,7 +12,8 @@ var process_states : Array[WState] = []
 
 
 func _ready() -> void:
-	_initialize(self)
+	if self_initialize:
+		_initialize(self)
 
 func _initialize(in_root_state : WState):
 	super(in_root_state)
@@ -49,7 +52,6 @@ func _handle_recursive_selected(selection : Array[WState]):
 		else:
 			_reenter_state(selected_state)
 	active_states.assign(selected_states)
-	
 	process_states.clear()
 	var deferred_states : Array[WState] = []
 	for active_state in active_states:

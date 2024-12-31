@@ -11,6 +11,7 @@ enum StateTrigger {ON_STATE_COMPLETED, ON_STATE_SUCCEEDED, ON_STATE_FAILED, ON_T
 
 var state : WState = null
 
+
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true

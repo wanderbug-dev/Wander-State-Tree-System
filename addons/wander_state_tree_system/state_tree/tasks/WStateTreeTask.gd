@@ -8,6 +8,7 @@ signal on_task_complete(completed_task : WStateTreeTask, success : bool)
 var state : WState = null
 var is_active : bool = false
 
+
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true

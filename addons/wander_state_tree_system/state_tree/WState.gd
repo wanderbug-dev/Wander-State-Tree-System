@@ -5,7 +5,6 @@ extends Node
 enum StateSearchPolicy {SEARCH_CHILDREN, STOP_SEARCH, SEARCH_TRANSITIONS}
 enum StateProcessOrder {SELF_FIRST, CHILDREN_FIRST}
 
-
 signal on_transition(new_state : WState)
 signal on_selected(selection : Array[WState])
 
@@ -34,7 +33,6 @@ func _initialize(in_root_state : WState):
 		child_state._initialize(root)
 
 func _process_state(delta: float):
-	print(self)
 	for task in tasks:
 		task._process_task(delta)
 	for transition in transitions:
@@ -75,11 +73,8 @@ func _enter():
 	if is_active:
 		return
 	is_active = true
-	print(self.name, " - state entered")
 	for task in tasks:
 		task.on_task_complete.connect(_handle_task_complete)
-		task._start()
-	for task in tasks:
 		task._start()
 
 func _reenter():
@@ -89,7 +84,6 @@ func _exit():
 	if not is_active:
 		return
 	is_active = false
-	print(self.name, " - state exited")
 	for task in tasks:
 		task.on_task_complete.disconnect(_handle_task_complete)
 	for task in tasks:

@@ -1,0 +1,86 @@
+[gd_scene load_steps=15 format=3 uid="uid://c1fqimnhqov5y"]
+
+[ext_resource type="Script" uid="uid://ckhlq0cbft0x1" path="res://addons/wander_state_tree_system/state_tree/WStateTree.gd" id="1_3ylp8"]
+[ext_resource type="Script" uid="uid://ds74a2dnd643d" path="res://addons/wander_state_tree_system/state_tree/WState.gd" id="2_ake5o"]
+[ext_resource type="Script" uid="uid://dd4hyyepoivv2" path="res://addons/wander_state_tree_system/state_tree/tasks/WStateTreeTask.gd" id="3_b32eu"]
+[ext_resource type="Script" uid="uid://bc8f63eef1l0d" path="res://addons/wander_state_tree_system/state_tree/tasks/WSTTWaitDelay.gd" id="4_0wfy0"]
+[ext_resource type="Script" uid="uid://cqm3rwsyxdtvm" path="res://addons/wander_state_tree_system/state_tree/tasks/WSTTDebugPrint.gd" id="4_t5c5w"]
+[ext_resource type="Script" uid="uid://bf7f6humlwgew" path="res://addons/wander_state_tree_system/state_tree/WStateTreeTransition.gd" id="5_4wcfn"]
+[ext_resource type="Script" uid="uid://b44psx6nei18d" path="res://addons/wander_state_tree_system/state_tree/conditions/WStateTreeCondition.gd" id="6_ssne2"]
+
+[sub_resource type="Resource" id="Resource_mr867"]
+resource_local_to_scene = true
+script = ExtResource("4_0wfy0")
+delay = 1.0
+metadata/_custom_type_script = ExtResource("4_0wfy0")
+
+[sub_resource type="Resource" id="Resource_t5c5w"]
+resource_local_to_scene = true
+script = ExtResource("4_t5c5w")
+debug_message = "B1 Entered"
+debug_color = Color(0.82, 0.82, 0.82, 1)
+metadata/_custom_type_script = ExtResource("4_t5c5w")
+
+[sub_resource type="Resource" id="Resource_c7bvs"]
+resource_local_to_scene = true
+script = ExtResource("5_4wcfn")
+trigger = 0
+conditions = Array[ExtResource("6_ssne2")]([])
+target_state = NodePath("../StateB2")
+metadata/_custom_type_script = ExtResource("5_4wcfn")
+
+[sub_resource type="Resource" id="Resource_3ylp8"]
+resource_local_to_scene = true
+script = ExtResource("4_t5c5w")
+debug_message = "C1 Entered"
+debug_color = Color(0.82, 0.82, 0.82, 1)
+metadata/_custom_type_script = ExtResource("4_t5c5w")
+
+[sub_resource type="Resource" id="Resource_0wfy0"]
+resource_local_to_scene = true
+script = ExtResource("4_0wfy0")
+delay = 1.0
+metadata/_custom_type_script = ExtResource("4_0wfy0")
+
+[sub_resource type="Resource" id="Resource_4wcfn"]
+resource_local_to_scene = true
+script = ExtResource("4_t5c5w")
+debug_message = "B2 Entered"
+debug_color = Color(0.82, 0.82, 0.82, 1)
+metadata/_custom_type_script = ExtResource("4_t5c5w")
+
+[sub_resource type="Resource" id="Resource_ssne2"]
+resource_local_to_scene = true
+script = ExtResource("5_4wcfn")
+trigger = 0
+conditions = Array[ExtResource("6_ssne2")]([])
+target_state = NodePath("../StateB1")
+metadata/_custom_type_script = ExtResource("5_4wcfn")
+
+[node name="StateTest" type="Node"]
+
+[node name="StateTree" type="Node" parent="."]
+script = ExtResource("1_3ylp8")
+self_initialize = true
+metadata/_custom_type_script = ExtResource("1_3ylp8")
+
+[node name="StateA1" type="Node" parent="StateTree"]
+script = ExtResource("2_ake5o")
+metadata/_custom_type_script = ExtResource("2_ake5o")
+
+[node name="StateB1" type="Node" parent="StateTree/StateA1"]
+script = ExtResource("2_ake5o")
+tasks = Array[ExtResource("3_b32eu")]([SubResource("Resource_mr867"), SubResource("Resource_t5c5w")])
+transitions = Array[ExtResource("5_4wcfn")]([SubResource("Resource_c7bvs")])
+metadata/_custom_type_script = ExtResource("2_ake5o")
+
+[node name="WStateC1" type="Node" parent="StateTree/StateA1/StateB1"]
+script = ExtResource("2_ake5o")
+tasks = Array[ExtResource("3_b32eu")]([SubResource("Resource_3ylp8")])
+metadata/_custom_type_script = ExtResource("2_ake5o")
+
+[node name="StateB2" type="Node" parent="StateTree/StateA1"]
+script = ExtResource("2_ake5o")
+tasks = Array[ExtResource("3_b32eu")]([SubResource("Resource_0wfy0"), SubResource("Resource_4wcfn")])
+transitions = Array[ExtResource("5_4wcfn")]([SubResource("Resource_ssne2")])
+metadata/_custom_type_script = ExtResource("2_ake5o")

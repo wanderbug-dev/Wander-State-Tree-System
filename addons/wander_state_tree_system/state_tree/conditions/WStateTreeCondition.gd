@@ -9,6 +9,7 @@ enum LogicalConnective {AND, OR}
 @export var inverse : bool = false
 @export var connective : LogicalConnective = LogicalConnective.AND
 
+
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true
