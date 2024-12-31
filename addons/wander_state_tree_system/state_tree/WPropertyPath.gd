@@ -1,4 +1,4 @@
-class_name BPropertyPath
+class_name WPropertyPath
 extends Resource
 
 
