@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://c1fqimnhqov5y"]
+[gd_scene load_steps=21 format=3 uid="uid://c1fqimnhqov5y"]
 
 [ext_resource type="Script" uid="uid://ckhlq0cbft0x1" path="res://addons/wander_state_tree_system/state_tree/WStateTree.gd" id="1_3ylp8"]
 [ext_resource type="Script" uid="uid://ds74a2dnd643d" path="res://addons/wander_state_tree_system/state_tree/WState.gd" id="2_ake5o"]
@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://cqm3rwsyxdtvm" path="res://addons/wander_state_tree_system/state_tree/tasks/WSTTDebugPrint.gd" id="4_t5c5w"]
 [ext_resource type="Script" uid="uid://bf7f6humlwgew" path="res://addons/wander_state_tree_system/state_tree/WStateTreeTransition.gd" id="5_4wcfn"]
 [ext_resource type="Script" uid="uid://b44psx6nei18d" path="res://addons/wander_state_tree_system/state_tree/conditions/WStateTreeCondition.gd" id="6_ssne2"]
-[ext_resource type="Script" uid="uid://b3umatwg5idf8" path="res://addons/wander_state_tree_system/state_tree/conditions/WSTCTaskID.gd" id="8_0wfy0"]
+[ext_resource type="Script" uid="uid://b3umatwg5idf8" path="res://addons/wander_state_tree_system/state_tree/conditions/WSTCTaskID.gd" id="8_ssne2"]
 [ext_resource type="Script" uid="uid://btvlelb67y6xi" path="res://addons/wander_state_tree_system/state_tree/conditions/WSTCComparator.gd" id="9_4wcfn"]
 [ext_resource type="Script" uid="uid://d0epng5ocq1ay" path="res://addons/wander_state_tree_system/state_tree/utils/WTaskPropertyPath.gd" id="10_ssne2"]
 
@@ -32,11 +32,13 @@ metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_e0mms"]
 resource_local_to_scene = true
-script = ExtResource("8_0wfy0")
-required_task_id = "B1WaitDelay"
+script = ExtResource("8_ssne2")
+task_search = 0
+task_index = 0
+task_id = "B1WaitDelay"
 inverse = false
 connective = 0
-metadata/_custom_type_script = ExtResource("8_0wfy0")
+metadata/_custom_type_script = ExtResource("8_ssne2")
 
 [sub_resource type="Resource" id="Resource_c7bvs"]
 resource_local_to_scene = true
@@ -59,6 +61,7 @@ metadata/_custom_type_script = ExtResource("4_t5c5w")
 [sub_resource type="Resource" id="Resource_vos0y"]
 script = ExtResource("10_ssne2")
 task_search = 0
+task_index = 0
 task_id = "B1WaitDelay"
 node_path = NodePath("../StateB1")
 property_name = "delay"
@@ -102,14 +105,6 @@ conditions = Array[ExtResource("6_ssne2")]([])
 target_state = NodePath("../StateB1")
 metadata/_custom_type_script = ExtResource("5_4wcfn")
 
-[sub_resource type="Resource" id="Resource_hr8iq"]
-resource_local_to_scene = true
-script = ExtResource("3_b32eu")
-id = &"mr867"
-restart_on_reentry = false
-finish_state = true
-metadata/_custom_type_script = ExtResource("3_b32eu")
-
 [node name="StateTest" type="Node"]
 
 [node name="StateTree" type="Node" parent="."]
@@ -137,5 +132,4 @@ script = ExtResource("2_ake5o")
 entry_conditions = Array[ExtResource("6_ssne2")]([SubResource("Resource_n68lr")])
 tasks = Array[ExtResource("3_b32eu")]([SubResource("Resource_0wfy0"), SubResource("Resource_4wcfn")])
 transitions = Array[ExtResource("5_4wcfn")]([SubResource("Resource_ssne2")])
-test_task = SubResource("Resource_hr8iq")
 metadata/_custom_type_script = ExtResource("2_ake5o")

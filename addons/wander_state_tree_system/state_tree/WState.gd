@@ -16,7 +16,6 @@ signal on_selected(selection : Array[WState])
 @export var entry_conditions : Array[WStateTreeCondition]
 @export var tasks : Array[WStateTreeTask]
 @export var transitions : Array[WStateTreeTransition]
-@export var test_task : WStateTreeTask
 
 var dynamic_properties : Dictionary[StringName, Variant] = {}
 var is_active : bool = false
@@ -39,8 +38,7 @@ func _initialize(in_root_state : WState):
 func _process_state(delta: float):
 	for task in tasks:
 		task._process_task(delta)
-	var context : Dictionary
-	add_state_context(self, context)
+	var context := create_new_context()
 	for transition in transitions:
 		if transition.trigger != transition.StateTrigger.ON_TICK:
 			continue
