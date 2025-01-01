@@ -7,6 +7,7 @@ signal on_task_complete(completed_task : WStateTreeTask, success : bool)
 
 @export var ID : String
 @export var restart_on_reentry : bool = false
+@export var finish_state : bool = true
 
 var state : WState = null
 var is_active : bool = false

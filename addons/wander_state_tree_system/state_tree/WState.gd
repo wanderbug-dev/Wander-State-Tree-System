@@ -4,15 +4,18 @@ extends Node
 
 enum StateSearchPolicy {SEARCH_CHILDREN, STOP_SEARCH, SEARCH_TRANSITIONS}
 enum StateProcessOrder {SELF_FIRST, CHILDREN_FIRST}
+enum TransitionDefaultPolicy {TO_ROOT, TO_PARENT, TO_SELF, DO_NOTHING}
 
 signal on_transition(new_state : WState)
 signal on_selected(selection : Array[WState])
 
+@export var enabled : bool = true
 @export var search_policy : StateSearchPolicy = StateSearchPolicy.SEARCH_CHILDREN
+@export var process_order : StateProcessOrder = StateProcessOrder.SELF_FIRST
+@export var transition_default_policy : TransitionDefaultPolicy = TransitionDefaultPolicy.TO_ROOT
 @export var entry_conditions : Array[WStateTreeCondition]
 @export var tasks : Array[WStateTreeTask]
 @export var transitions : Array[WStateTreeTransition]
-@export var process_order : StateProcessOrder = StateProcessOrder.SELF_FIRST
 
 var dynamic_properties : Dictionary = {}
 var is_active : bool = false
@@ -50,8 +53,9 @@ func _physics_process_state(delta : float):
 		task._physics_process_task(delta)
 
 func _evaluate_entry()->bool:
-	var context : Dictionary
-	add_state_context(self, context)
+	if not enabled:
+		return false
+	var context := create_new_context()
 	return check_conditions(context, entry_conditions)
 
 static func check_conditions(context : Dictionary, in_conditions : Array[WStateTreeCondition])->bool:
@@ -117,6 +121,8 @@ func get_parent_state()->WState:
 	return get_parent() as WState
 
 func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
+	if in_task.finish_state == false:
+		return
 	var context : Dictionary = create_new_context()
 	add_task_context(in_task, context)
 	for transition in transitions:
@@ -129,7 +135,17 @@ func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
 		elif transition.trigger == transition.StateTrigger.ON_STATE_FAILED and not was_success:
 			if _try_transition(transition, context):
 				return
-	transition_state(self)
+	_default_transition()
+
+func _default_transition():
+	if transition_default_policy == TransitionDefaultPolicy.TO_ROOT:
+		transition_state(root)
+	if transition_default_policy == TransitionDefaultPolicy.TO_PARENT:
+		transition_state(get_parent_state())
+	if transition_default_policy == TransitionDefaultPolicy.TO_SELF:
+		transition_state(self)
+	if transition_default_policy == TransitionDefaultPolicy.DO_NOTHING:
+		return
 
 func _try_transition(in_transition : WStateTreeTransition, context : Dictionary)->bool:
 	var new_state : WState = in_transition._evaluate_transition(context)

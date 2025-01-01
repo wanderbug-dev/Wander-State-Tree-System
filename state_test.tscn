@@ -14,7 +14,8 @@ resource_local_to_scene = true
 script = ExtResource("4_0wfy0")
 delay = 1.0
 ID = "B1WaitDelay"
-restart_on_reentry = null
+restart_on_reentry = false
+finish_state = true
 metadata/_custom_type_script = ExtResource("4_0wfy0")
 
 [sub_resource type="Resource" id="Resource_t5c5w"]
@@ -23,7 +24,8 @@ script = ExtResource("4_t5c5w")
 debug_message = "B1 Entered"
 debug_color = Color(0.315209, 0.802864, 1, 1)
 ID = "B1DebugPrint"
-restart_on_reentry = null
+restart_on_reentry = false
+finish_state = true
 metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_e0mms"]
@@ -48,7 +50,8 @@ script = ExtResource("4_t5c5w")
 debug_message = "C1 Entered"
 debug_color = Color(0.777922, 0.983838, 1, 1)
 ID = "C1DebugPrint"
-restart_on_reentry = null
+restart_on_reentry = false
+finish_state = true
 metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_0wfy0"]
@@ -56,16 +59,18 @@ resource_local_to_scene = true
 script = ExtResource("4_0wfy0")
 delay = 1.0
 ID = "B2WaitDelay"
-restart_on_reentry = null
+restart_on_reentry = false
+finish_state = true
 metadata/_custom_type_script = ExtResource("4_0wfy0")
 
 [sub_resource type="Resource" id="Resource_4wcfn"]
 resource_local_to_scene = true
 script = ExtResource("4_t5c5w")
 debug_message = "B2 Entered"
-debug_color = Color(1.07813e-05, 0.963225, 0.699998, 1)
+debug_color = Color(1, 0.754661, 0.678664, 1)
 ID = "B2DebugPrint"
-restart_on_reentry = null
+restart_on_reentry = false
+finish_state = true
 metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_ssne2"]
