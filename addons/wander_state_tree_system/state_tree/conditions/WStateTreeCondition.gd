@@ -14,11 +14,11 @@ func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true
 
-func _check_condition(in_state : WState)->bool:
-	return finalize_result(true)
+func _check_condition(context : Dictionary)->bool:
+	return true
 
-func finalize_result(in_result : bool)->bool:
+func _result(context : Dictionary)->bool:
 	if inverse:
-		return !in_result
+		return !_check_condition(context)
 	else:
-		return in_result
+		return _check_condition(context)

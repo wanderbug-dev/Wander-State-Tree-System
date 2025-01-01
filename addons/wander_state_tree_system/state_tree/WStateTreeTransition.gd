@@ -19,13 +19,13 @@ func _init() -> void:
 func _initialize(in_state : WState):
 	state = in_state
 
-func _evaluate_transition()->WState:
+func _evaluate_transition(context : Dictionary)->WState:
 	var new_state := get_target_state()
 	if not new_state:
 		return null
 	if not new_state._evaluate_entry():
 		return null
-	if not state._check_conditions(conditions):
+	if not state.check_conditions(context, conditions):
 		return null
 	return new_state
 

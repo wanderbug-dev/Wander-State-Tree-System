@@ -31,6 +31,13 @@ func _select_state(in_state : WState):
 	selected_states.clear()
 	if not in_state:
 		return
+	if active_states.has(in_state):
+		var pending_index : int = active_states.find(in_state)
+		var pending_states : Array[WState] = active_states.slice(pending_index)
+		pending_states.reverse()
+		for pending_state in pending_states:
+			_exit_state(pending_state)
+		active_states.resize(pending_index)
 	target_state = in_state._search()
 	target_state._selected(selected_states)
 
@@ -40,7 +47,7 @@ func _handle_state_transition(in_state : WState):
 func _selected(selection : Array[WState]):
 	super(selection)
 
-func _handle_recursive_selected(selection : Array[WState]):
+func _handle_child_selected_recursive(selection : Array[WState]):
 	super(selection)
 	active_states.reverse()
 	for active_state in active_states:

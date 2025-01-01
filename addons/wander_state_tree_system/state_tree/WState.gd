@@ -29,16 +29,18 @@ func _initialize(in_root_state : WState):
 	for transition in transitions:
 		transition._initialize(self)
 	for child_state in get_child_states():
-		child_state.on_selected.connect(_handle_recursive_selected)
+		child_state.on_selected.connect(_handle_child_selected_recursive)
 		child_state._initialize(root)
 
 func _process_state(delta: float):
 	for task in tasks:
 		task._process_task(delta)
+	var context : Dictionary
+	add_state_context(self, context)
 	for transition in transitions:
 		if transition.trigger != transition.StateTrigger.ON_TICK:
 			continue
-		var new_state : WState = transition._evaluate_transition()
+		var new_state : WState = transition._evaluate_transition(context)
 		if new_state:
 			transition_state(new_state)
 			break
@@ -48,14 +50,16 @@ func _physics_process_state(delta : float):
 		task._physics_process_task(delta)
 
 func _evaluate_entry()->bool:
-	return _check_conditions(entry_conditions)
+	var context : Dictionary
+	add_state_context(self, context)
+	return check_conditions(context, entry_conditions)
 
-func _check_conditions(in_conditions : Array[WStateTreeCondition])->bool:
+static func check_conditions(context : Dictionary, in_conditions : Array[WStateTreeCondition])->bool:
 	if in_conditions.size() == 0:
 		return true
 	var successful_condition : bool = false
 	for condition in in_conditions:
-		if not condition._check_condition(self):
+		if not condition._result(context):
 			if condition.connective == condition.LogicalConnective.AND:
 				return false
 		else:
@@ -63,9 +67,9 @@ func _check_conditions(in_conditions : Array[WStateTreeCondition])->bool:
 	return successful_condition
 
 func _selected(selection : Array[WState]):
-	_handle_recursive_selected(selection)
+	_handle_child_selected_recursive(selection)
 
-func _handle_recursive_selected(selection : Array[WState]):
+func _handle_child_selected_recursive(selection : Array[WState]):
 	selection.insert(0, self)
 	on_selected.emit(selection)
 
@@ -78,7 +82,8 @@ func _enter():
 		task._start()
 
 func _reenter():
-	pass
+	for task in tasks:
+		task._restart()
 
 func _exit():
 	if not is_active:
@@ -111,20 +116,23 @@ func get_child_states()->Array[WState]:
 func get_parent_state()->WState:
 	return get_parent() as WState
 
-func _handle_task_complete(_in_task : WStateTreeTask, was_success : bool):
+func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
+	var context : Dictionary = create_new_context()
+	add_task_context(in_task, context)
 	for transition in transitions:
 		if transition.trigger == transition.StateTrigger.ON_STATE_COMPLETED:
-			if _try_transition(transition):
+			if _try_transition(transition, context):
 				return
 		elif transition.trigger == transition.StateTrigger.ON_STATE_SUCCEEDED and was_success:
-			if _try_transition(transition):
+			if _try_transition(transition, context):
 				return
 		elif transition.trigger == transition.StateTrigger.ON_STATE_FAILED and not was_success:
-			if _try_transition(transition):
+			if _try_transition(transition, context):
 				return
+	transition_state(self)
 
-func _try_transition(in_transition : WStateTreeTransition)->bool:
-	var new_state : WState = in_transition._evaluate_transition()
+func _try_transition(in_transition : WStateTreeTransition, context : Dictionary)->bool:
+	var new_state : WState = in_transition._evaluate_transition(context)
 	if new_state:
 		transition_state(new_state)
 		return true
@@ -149,11 +157,28 @@ func search_children()->WState:
 	return self
 
 func search_transitions()->WState:
+	var context : Dictionary = create_new_context()
 	for transition in transitions:
 		if transition.trigger != transition.StateTrigger.ON_SEARCH:
 			continue
-		if not transition._evaluate_transition():
+		if not transition._evaluate_transition(context):
 			continue
 		var next_state : WState = transition.get_target_state()
 		return next_state._search()
 	return self
+
+func create_new_context()->Dictionary:
+	var context : Dictionary = {}
+	add_state_context(self, context)
+	return context
+
+static func add_state_context(state : WState, in_context : Dictionary):
+	in_context["state"] = state
+
+static func add_task_context(task : WStateTreeTask, in_context : Dictionary):
+	in_context["task"] = task
+
+static func get_task_context(context : Dictionary)->WStateTreeTask:
+	if context.has("task"):
+		return context["task"] as WStateTreeTask
+	return null

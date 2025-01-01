@@ -5,6 +5,9 @@ extends Resource
 
 signal on_task_complete(completed_task : WStateTreeTask, success : bool)
 
+@export var ID : String
+@export var restart_on_reentry : bool = false
+
 var state : WState = null
 var is_active : bool = false
 
@@ -12,6 +15,7 @@ var is_active : bool = false
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true
+		ID = generate_scene_unique_id()
 
 func _initialize(in_state : WState):
 	state = in_state
@@ -25,8 +29,9 @@ func _physics_process_task(delta : float):
 func _start():
 	is_active = true
 
-func _restart():
-	pass
+func _restart(force_restart : bool = false):
+	if (not is_active and restart_on_reentry) or force_restart:
+		_start()
 
 func _end():
 	is_active = false
