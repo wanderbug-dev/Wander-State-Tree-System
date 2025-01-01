@@ -11,8 +11,7 @@ enum LogicalConnective {AND, OR}
 
 
 func _init() -> void:
-	if Engine.is_editor_hint():
-		resource_local_to_scene = true
+	pass
 
 func _check_condition(context : Dictionary)->bool:
 	return true
