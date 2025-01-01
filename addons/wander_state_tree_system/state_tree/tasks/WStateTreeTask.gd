@@ -5,7 +5,7 @@ extends Resource
 
 signal on_task_complete(completed_task : WStateTreeTask, success : bool)
 
-@export var ID : String
+@export var id : StringName
 @export var restart_on_reentry : bool = false
 @export var finish_state : bool = true
 
@@ -16,7 +16,7 @@ var is_active : bool = false
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true
-		ID = generate_scene_unique_id()
+		id = generate_scene_unique_id()
 
 func _initialize(in_state : WState):
 	state = in_state

@@ -16,8 +16,9 @@ signal on_selected(selection : Array[WState])
 @export var entry_conditions : Array[WStateTreeCondition]
 @export var tasks : Array[WStateTreeTask]
 @export var transitions : Array[WStateTreeTransition]
+@export var test_task : WStateTreeTask
 
-var dynamic_properties : Dictionary = {}
+var dynamic_properties : Dictionary[StringName, Variant] = {}
 var is_active : bool = false
 var root : WState = null
 
@@ -98,15 +99,15 @@ func _exit():
 	for task in tasks:
 		task._end()
 
-func set_dynamic_property(property_name : String, value : Variant):
+func set_dynamic_property(property_name : StringName, value : Variant):
 	dynamic_properties[property_name] = value
 
-func get_dynamic_property(property_name: String)->Variant:
-	if dynamic_properties.has(property_name):
+func get_dynamic_property(property_name: StringName)->Variant:
+	if has_dynamic_property(property_name):
 		return dynamic_properties[property_name]
 	return null
 
-func has_dynamic_property(property_name : String)->bool:
+func has_dynamic_property(property_name : StringName)->bool:
 	return dynamic_properties.has(property_name)
 
 func get_child_states()->Array[WState]:
@@ -188,11 +189,27 @@ func create_new_context()->Dictionary:
 	add_state_context(self, context)
 	return context
 
+func get_task_by_id(in_id : String)->WStateTreeTask:
+	for task in tasks:
+		if task.id == in_id:
+			return task
+	return null
+
+func get_task_by_index(in_index : int)->WStateTreeTask:
+	if tasks.size() > in_index:
+		return tasks[in_index]
+	return null
+
 static func add_state_context(state : WState, in_context : Dictionary):
 	in_context["state"] = state
 
 static func add_task_context(task : WStateTreeTask, in_context : Dictionary):
 	in_context["task"] = task
+
+static func get_state_context(context : Dictionary)->WState:
+	if context.has("state"):
+		return context["state"] as WState
+	return null
 
 static func get_task_context(context : Dictionary)->WStateTreeTask:
 	if context.has("task"):
