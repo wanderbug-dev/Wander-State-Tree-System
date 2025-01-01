@@ -1,18 +1,14 @@
 class_name WPropertyPath
 extends Resource
 
-
-@export_node_path() var node_path : NodePath
 @export var property_name : String
 
 
-func get_property(start_node : Node)->Variant:
-	var target_node : Node = start_node.get_node_or_null(node_path)
-	if target_node:
-		return target_node.get_indexed(property_name)
-	return null
+func get_property(source : Object)->Variant:
+	return _get_target_object(source).get_indexed(property_name)
 		
-func set_property(start_node : Node, value : Variant):
-	var target_node : Node = start_node.get_node_or_null(node_path)
-	if target_node:
-		target_node.set_indexed(property_name, value)
+func set_property(source : Object, value : Variant):
+	_get_target_object(source).set_indexed(property_name, value)
+
+func _get_target_object(source : Object)->Object:
+	return source

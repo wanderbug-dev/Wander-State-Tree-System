@@ -12,8 +12,8 @@ enum TaskSearch {BY_ID, BY_INDEX}
 		task_search = value
 		notify_property_list_changed()
 
-var task_index : int
-var task_id : String
+@export_storage var task_index : int
+@export_storage var task_id : String
 
 
 func _get_property_list() -> Array[Dictionary]:
@@ -37,12 +37,11 @@ func _get_property_list() -> Array[Dictionary]:
 func _check_condition(context : Dictionary)->bool:
 	var task : WStateTreeTask = WState.get_task_context(context)
 	var state : WState = WState.get_state_context(context)
-	var index : int = -1
-	if task:
-		if state:
-			index = state.tasks.find(task)
+	if !is_instance_valid(task) or !is_instance_valid(state):
+		return false
 	if task_search == TaskSearch.BY_ID:
 		return task_id == task.id
 	if task_search == TaskSearch.BY_INDEX:
+		var index : int = state.get_task_index(task)
 		return task_index == index
 	return false

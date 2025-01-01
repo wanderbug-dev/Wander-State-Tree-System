@@ -32,8 +32,10 @@ metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_e0mms"]
 script = ExtResource("8_ssne2")
-task_search = 0
+task_search = 1
+task_index = 0
 task_id = "B1WaitDelay"
+task_index = 0
 inverse = false
 connective = 0
 metadata/_custom_type_script = ExtResource("8_ssne2")
@@ -58,8 +60,10 @@ metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_vos0y"]
 script = ExtResource("10_ssne2")
-task_search = 0
-task_id = "B1WaitDelay"
+task_search = 1
+task_index = 0
+task_id = ""
+task_index = 0
 node_path = NodePath("../StateB1")
 property_name = "delay"
 metadata/_custom_type_script = ExtResource("10_ssne2")
@@ -67,8 +71,8 @@ metadata/_custom_type_script = ExtResource("10_ssne2")
 [sub_resource type="Resource" id="Resource_n68lr"]
 script = ExtResource("9_4wcfn")
 target_property = SubResource("Resource_vos0y")
-compare_values = Dictionary[int, Variant]({
-0: 1.0
+compare_values = Dictionary[StringName, Variant]({
+&"=": 1.0
 })
 inverse = false
 connective = 0

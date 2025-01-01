@@ -198,6 +198,9 @@ func get_task_by_index(in_index : int)->WStateTreeTask:
 		return tasks[in_index]
 	return null
 
+func get_task_index(in_task : WStateTreeTask)->int:
+	return tasks.find(in_task)
+
 static func add_state_context(state : WState, in_context : Dictionary):
 	in_context["state"] = state
 

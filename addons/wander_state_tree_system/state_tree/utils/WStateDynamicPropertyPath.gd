@@ -1,14 +1,14 @@
 class_name WStateDynamicPropertyPath
-extends WPropertyPath
+extends WNodePropertyPath
 
 
-func get_property(start_node : Node)->Variant:
-	var target_state := start_node.get_node_or_null(node_path) as WState
+func get_property(source : Object)->Variant:
+	var target_state := _get_target_object(source) as WState
 	if target_state:
 		return target_state.get_dynamic_property(property_name)
 	return null
-
-func set_property(start_node : Node, value : Variant):
-	var target_state := start_node.get_node_or_null(node_path) as WState
+		
+func set_property(source : Object, value : Variant):
+	var target_state := _get_target_object(source) as WState
 	if target_state:
 		target_state.set_dynamic_property(property_name, value)
