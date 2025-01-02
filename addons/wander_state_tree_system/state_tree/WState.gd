@@ -8,6 +8,7 @@ enum TransitionDefaultPolicy {TO_ROOT, TO_PARENT, TO_SELF, DO_NOTHING}
 
 signal on_transition(new_state : WState)
 signal on_selected(selection : Array[WState])
+signal on_event(event_tag : StringName, event_payload : Dictionary)
 
 @export var enabled : bool = true
 @export var search_policy : StateSearchPolicy = StateSearchPolicy.SEARCH_CHILDREN

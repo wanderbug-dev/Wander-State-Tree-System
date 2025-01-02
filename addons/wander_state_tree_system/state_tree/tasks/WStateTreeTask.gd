@@ -46,6 +46,3 @@ func _fail():
 func _complete(success : bool):
 	_end()
 	on_task_complete.emit(self, success)
-
-func test()->void:
-	pass
