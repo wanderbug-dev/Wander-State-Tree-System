@@ -45,7 +45,9 @@ resource_local_to_scene = true
 script = ExtResource("5_4wcfn")
 trigger = 0
 conditions = Array[ExtResource("6_ssne2")]([SubResource("Resource_e0mms")])
+delay = 0.0
 target_state = NodePath("../StateB2")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("5_4wcfn")
 
 [sub_resource type="Resource" id="Resource_3ylp8"]
@@ -102,14 +104,15 @@ resource_local_to_scene = true
 script = ExtResource("5_4wcfn")
 trigger = 0
 conditions = Array[ExtResource("6_ssne2")]([])
-target_state = NodePath("../StateB1")
+delay = null
+target_state = NodePath("../StateB1/StateC1")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("5_4wcfn")
 
 [node name="StateTest" type="Node"]
 
 [node name="StateTree" type="Node" parent="."]
 script = ExtResource("1_3ylp8")
-self_initialize = true
 metadata/_custom_type_script = ExtResource("1_3ylp8")
 
 [node name="StateA1" type="Node" parent="StateTree"]

@@ -7,8 +7,12 @@ enum StateProcessOrder {SELF_FIRST, CHILDREN_FIRST}
 enum TransitionDefaultPolicy {TO_ROOT, TO_PARENT, TO_SELF, DO_NOTHING}
 
 signal on_transition(new_state : WState)
-signal on_selected(selection : Array[WState])
+signal on_recursive_selection(selection : Array[WState])
+signal on_selected(state : WState)
 signal on_event(event_tag : StringName, event_payload : Dictionary)
+
+signal on_entered(state : WState)
+signal on_exited(state : WState)
 
 @export var enabled : bool = true
 @export var search_policy : StateSearchPolicy = StateSearchPolicy.SEARCH_CHILDREN
@@ -22,10 +26,6 @@ var dynamic_properties : Dictionary[StringName, Variant] = {}
 var is_active : bool = false
 var root : WState = null
 
-
-func _ready() -> void:
-	pass
-
 func _initialize(in_root_state : WState):
 	root = in_root_state
 	for task in tasks:
@@ -33,20 +33,25 @@ func _initialize(in_root_state : WState):
 	for transition in transitions:
 		transition._initialize(self)
 	for child_state in get_child_states():
-		child_state.on_selected.connect(_handle_child_selected_recursive)
+		child_state.on_recursive_selection.connect(_handle_recursive_selection)
 		child_state._initialize(root)
+	in_root_state.on_event.connect(_handle_event)
 
 func _process_state(delta: float):
 	for task in tasks:
 		task._process_task(delta)
 	var context := create_new_context()
 	for transition in transitions:
-		if transition.trigger != transition.StateTrigger.ON_TICK:
+		if transition.is_pending():
+			if transition.decrement_pending_time(delta):
+				transition_state(transition.get_target_state())
+				break
 			continue
-		var new_state : WState = transition._evaluate_transition(context)
-		if new_state:
-			transition_state(new_state)
-			break
+		if not transition.check_tick_trigger():
+			continue
+		if _try_transition(transition, context):
+			if not transition.has_delay():
+				break
 
 func _physics_process_state(delta : float):
 	for task in tasks:
@@ -71,11 +76,12 @@ static func check_conditions(context : Dictionary, in_conditions : Array[WStateT
 	return successful_condition
 
 func _selected(selection : Array[WState]):
-	_handle_child_selected_recursive(selection)
+	on_selected.emit(self)
+	_handle_recursive_selection(selection)
 
-func _handle_child_selected_recursive(selection : Array[WState]):
+func _handle_recursive_selection(selection : Array[WState]):
 	selection.insert(0, self)
-	on_selected.emit(selection)
+	on_recursive_selection.emit(selection)
 
 func _enter():
 	if is_active:
@@ -84,6 +90,7 @@ func _enter():
 	for task in tasks:
 		task.on_task_complete.connect(_handle_task_complete)
 		task._start()
+	on_entered.emit(self)
 
 func _reenter():
 	for task in tasks:
@@ -97,45 +104,35 @@ func _exit():
 		task.on_task_complete.disconnect(_handle_task_complete)
 	for task in tasks:
 		task._end()
+	for transition in transitions:
+		transition.clear_pending()
+	on_exited.emit(self)
 
-func set_dynamic_property(property_name : StringName, value : Variant):
-	dynamic_properties[property_name] = value
+func _event(event_tag : StringName, event_payload : Dictionary):
+	add_state_context(self, event_payload)
+	_handle_event(event_tag, event_payload)
+	on_event.emit(event_tag, event_payload)
 
-func get_dynamic_property(property_name: StringName)->Variant:
-	if has_dynamic_property(property_name):
-		return dynamic_properties[property_name]
-	return null
-
-func has_dynamic_property(property_name : StringName)->bool:
-	return dynamic_properties.has(property_name)
-
-func get_child_states()->Array[WState]:
-	var child_states : Array[WState] = []
-	for child in get_children():
-		var child_state = child as WState
-		if child_state:
-			child_states.append(child_state)
-	return child_states
-
-func get_parent_state()->WState:
-	return get_parent() as WState
+func _handle_event(event_tag : StringName, event_payload : Dictionary):
+	for transition in transitions:
+		if transition.check_event_trigger(event_tag):
+			_try_transition(transition, event_payload)
 
 func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
 	if in_task.finish_state == false:
 		return
 	var context : Dictionary = create_new_context()
 	add_task_context(in_task, context)
+	var has_pending_transition : bool = false
 	for transition in transitions:
-		if transition.trigger == transition.StateTrigger.ON_STATE_COMPLETED:
+		if transition.check_state_completion_trigger(was_success):
 			if _try_transition(transition, context):
-				return
-		elif transition.trigger == transition.StateTrigger.ON_STATE_SUCCEEDED and was_success:
-			if _try_transition(transition, context):
-				return
-		elif transition.trigger == transition.StateTrigger.ON_STATE_FAILED and not was_success:
-			if _try_transition(transition, context):
-				return
-	_default_transition()
+				if transition.has_delay():
+					has_pending_transition = true
+				else:
+					return
+	if not has_pending_transition:
+		_default_transition()
 
 func _default_transition():
 	if transition_default_policy == TransitionDefaultPolicy.TO_ROOT:
@@ -148,14 +145,30 @@ func _default_transition():
 		return
 
 func _try_transition(in_transition : WStateTreeTransition, context : Dictionary)->bool:
-	var new_state : WState = in_transition._evaluate_transition(context)
-	if new_state:
-		transition_state(new_state)
+	var next_state : WState = in_transition._evaluate_transition(context)
+	if next_state:
+		if in_transition.has_delay():
+			in_transition.set_pending()
+		else:
+			transition_state(next_state)
 		return true
 	return false
 
 func transition_state(in_state : WState):
+	for transition in transitions:
+		transition.clear_pending()
 	on_transition.emit(in_state)
+
+func get_child_states()->Array[WState]:
+	var child_states : Array[WState] = []
+	for child in get_children():
+		var child_state = child as WState
+		if child_state:
+			child_states.append(child_state)
+	return child_states
+
+func get_parent_state()->WState:
+	return get_parent() as WState
 
 func _search()->WState:
 	if search_policy == StateSearchPolicy.SEARCH_CHILDREN:
@@ -175,7 +188,7 @@ func search_children()->WState:
 func search_transitions()->WState:
 	var context : Dictionary = create_new_context()
 	for transition in transitions:
-		if transition.trigger != transition.StateTrigger.ON_SEARCH:
+		if transition.trigger != transition.Trigger.ON_SEARCH:
 			continue
 		if not transition._evaluate_transition(context):
 			continue
@@ -183,8 +196,20 @@ func search_transitions()->WState:
 		return next_state._search()
 	return self
 
+func set_dynamic_property(property_name : StringName, value : Variant):
+	dynamic_properties[property_name] = value
+
+func get_dynamic_property(property_name: StringName)->Variant:
+	if has_dynamic_property(property_name):
+		return dynamic_properties[property_name]
+	return null
+
+func has_dynamic_property(property_name : StringName)->bool:
+	return dynamic_properties.has(property_name)
+
 func create_new_context()->Dictionary:
 	var context : Dictionary = {}
+	add_root_context(root, context)
 	add_state_context(self, context)
 	return context
 
@@ -202,16 +227,24 @@ func get_task_by_index(in_index : int)->WStateTreeTask:
 func get_task_index(in_task : WStateTreeTask)->int:
 	return tasks.find(in_task)
 
+static func add_root_context(root : WState, in_context : Dictionary):
+	in_context["root"] = root
+
+static func get_root_context(context : Dictionary)->WState:
+	if context.has("root"):
+		return context["root"] as WState
+	return null
+
 static func add_state_context(state : WState, in_context : Dictionary):
 	in_context["state"] = state
-
-static func add_task_context(task : WStateTreeTask, in_context : Dictionary):
-	in_context["task"] = task
 
 static func get_state_context(context : Dictionary)->WState:
 	if context.has("state"):
 		return context["state"] as WState
 	return null
+
+static func add_task_context(task : WStateTreeTask, in_context : Dictionary):
+	in_context["task"] = task
 
 static func get_task_context(context : Dictionary)->WStateTreeTask:
 	if context.has("task"):

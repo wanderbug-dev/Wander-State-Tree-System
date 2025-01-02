@@ -2,7 +2,7 @@ class_name WStateTree
 extends WState
 
 
-@export var self_initialize: bool = false
+@export var self_initialize: bool = true
 
 var state_tree_owner : Node = null
 var target_state : WState = null
@@ -32,14 +32,17 @@ func _select_state(in_state : WState):
 	if not in_state:
 		return
 	if active_states.has(in_state):
-		var pending_index : int = active_states.find(in_state)
-		var pending_states : Array[WState] = active_states.slice(pending_index)
-		pending_states.reverse()
-		for pending_state in pending_states:
-			_exit_state(pending_state)
-		active_states.resize(pending_index)
+		_exit_active_branch(in_state)
 	target_state = in_state._search()
 	target_state._selected(selected_states)
+
+func _exit_active_branch(start_state : WState):
+	var pending_index : int = active_states.find(start_state)
+	var pending_states : Array[WState] = active_states.slice(pending_index)
+	pending_states.reverse()
+	for pending_state in pending_states:
+		_exit_state(pending_state)
+	active_states.resize(pending_index)
 
 func _handle_state_transition(in_state : WState):
 	_select_state(in_state)
@@ -47,7 +50,7 @@ func _handle_state_transition(in_state : WState):
 func _selected(selection : Array[WState]):
 	super(selection)
 
-func _handle_child_selected_recursive(selection : Array[WState]):
+func _handle_recursive_selection(selection : Array[WState]):
 	super(selection)
 	active_states.reverse()
 	for active_state in active_states:
@@ -82,18 +85,20 @@ func _exit_state(in_state : WState):
 
 func _enter():
 	super()
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+func _exit():
+	super()
+
+func get_branch(end_state : WState)->Array[WState]:
+	var branch_path : String = get_path_to(end_state)
+	var branch_segments := branch_path.split("/", false)
+	var branch_states : Array[WState]
+	branch_path = ""
+	for segment in branch_segments:
+		if branch_path.is_empty():
+			branch_path = segment
+		else:
+			branch_path = branch_path + "/" + segment
+		var branch_state := get_node(branch_path) as WState
+		branch_states.append(branch_state)
+	return branch_states
