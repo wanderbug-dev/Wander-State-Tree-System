@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://c1fqimnhqov5y"]
+[gd_scene load_steps=20 format=3 uid="uid://c1fqimnhqov5y"]
 
 [ext_resource type="Script" uid="uid://ckhlq0cbft0x1" path="res://addons/wander_state_tree_system/state_tree/WStateTree.gd" id="1_3ylp8"]
 [ext_resource type="Script" uid="uid://ds74a2dnd643d" path="res://addons/wander_state_tree_system/state_tree/WState.gd" id="2_ake5o"]
@@ -7,9 +7,18 @@
 [ext_resource type="Script" uid="uid://cqm3rwsyxdtvm" path="res://addons/wander_state_tree_system/state_tree/tasks/WSTTDebugPrint.gd" id="4_t5c5w"]
 [ext_resource type="Script" uid="uid://bf7f6humlwgew" path="res://addons/wander_state_tree_system/state_tree/WStateTreeTransition.gd" id="5_4wcfn"]
 [ext_resource type="Script" uid="uid://b44psx6nei18d" path="res://addons/wander_state_tree_system/state_tree/conditions/WStateTreeCondition.gd" id="6_ssne2"]
-[ext_resource type="Script" uid="uid://b3umatwg5idf8" path="res://addons/wander_state_tree_system/state_tree/conditions/WSTCTaskID.gd" id="8_ssne2"]
 [ext_resource type="Script" uid="uid://btvlelb67y6xi" path="res://addons/wander_state_tree_system/state_tree/conditions/WSTCComparator.gd" id="9_4wcfn"]
 [ext_resource type="Script" uid="uid://d0epng5ocq1ay" path="res://addons/wander_state_tree_system/state_tree/utils/WTaskPropertyPath.gd" id="10_ssne2"]
+
+[sub_resource type="Resource" id="Resource_hr8iq"]
+resource_local_to_scene = true
+script = ExtResource("4_t5c5w")
+debug_message = "A1 Entered"
+debug_color = Color(0.83892, 0.420326, 0.867921, 1)
+id = &"ssne2"
+restart_on_reentry = false
+trigger_state_completion = false
+metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_mr867"]
 resource_local_to_scene = true
@@ -17,7 +26,7 @@ script = ExtResource("4_0wfy0")
 delay = 1.0
 id = &"B1WaitDelay"
 restart_on_reentry = false
-finish_state = true
+trigger_state_completion = true
 metadata/_custom_type_script = ExtResource("4_0wfy0")
 
 [sub_resource type="Resource" id="Resource_t5c5w"]
@@ -27,24 +36,14 @@ debug_message = "B1 Entered"
 debug_color = Color(0.315209, 0.802864, 1, 1)
 id = &"f6g5w"
 restart_on_reentry = false
-finish_state = true
+trigger_state_completion = false
 metadata/_custom_type_script = ExtResource("4_t5c5w")
-
-[sub_resource type="Resource" id="Resource_e0mms"]
-script = ExtResource("8_ssne2")
-task_search = 1
-task_index = 0
-task_id = "B1WaitDelay"
-task_index = 0
-inverse = false
-connective = 0
-metadata/_custom_type_script = ExtResource("8_ssne2")
 
 [sub_resource type="Resource" id="Resource_c7bvs"]
 resource_local_to_scene = true
 script = ExtResource("5_4wcfn")
 trigger = 0
-conditions = Array[ExtResource("6_ssne2")]([SubResource("Resource_e0mms")])
+conditions = Array[ExtResource("6_ssne2")]([])
 delay = 0.0
 target_state = NodePath("../StateB2")
 event_tag = &""
@@ -57,7 +56,7 @@ debug_message = "C1 Entered"
 debug_color = Color(0.777922, 0.983838, 1, 1)
 id = &"c3dtf"
 restart_on_reentry = false
-finish_state = true
+trigger_state_completion = false
 metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_vos0y"]
@@ -86,17 +85,17 @@ script = ExtResource("4_0wfy0")
 delay = 1.0
 id = &"1j3e8"
 restart_on_reentry = false
-finish_state = true
+trigger_state_completion = true
 metadata/_custom_type_script = ExtResource("4_0wfy0")
 
 [sub_resource type="Resource" id="Resource_4wcfn"]
 resource_local_to_scene = true
 script = ExtResource("4_t5c5w")
 debug_message = "B2 Entered"
-debug_color = Color(1, 0.754661, 0.678664, 1)
+debug_color = Color(0.999997, 0.570794, 0.438447, 1)
 id = &"2s6ob"
 restart_on_reentry = false
-finish_state = true
+trigger_state_completion = false
 metadata/_custom_type_script = ExtResource("4_t5c5w")
 
 [sub_resource type="Resource" id="Resource_ssne2"]
@@ -104,7 +103,7 @@ resource_local_to_scene = true
 script = ExtResource("5_4wcfn")
 trigger = 0
 conditions = Array[ExtResource("6_ssne2")]([])
-delay = null
+delay = 0.0
 target_state = NodePath("../StateB1/StateC1")
 event_tag = &""
 metadata/_custom_type_script = ExtResource("5_4wcfn")
@@ -117,6 +116,7 @@ metadata/_custom_type_script = ExtResource("1_3ylp8")
 
 [node name="StateA1" type="Node" parent="StateTree"]
 script = ExtResource("2_ake5o")
+tasks = Array[ExtResource("3_b32eu")]([SubResource("Resource_hr8iq")])
 metadata/_custom_type_script = ExtResource("2_ake5o")
 
 [node name="StateB1" type="Node" parent="StateTree/StateA1"]

@@ -3,11 +3,15 @@ class_name WStateTreeTask
 extends Resource
 
 
-signal on_task_complete(completed_task : WStateTreeTask, success : bool)
+signal on_task_complete(completed_task : WStateTreeTask, success : bool, complete : bool)
 
-@export var id : StringName
+@export var id : StringName:
+	set(value):
+		id = value
+		if id.is_empty():
+			id = generate_scene_unique_id()
 @export var restart_on_reentry : bool = false
-@export var finish_state : bool = true
+@export var trigger_state_completion : bool = true
 
 var state : WState = null
 var is_active : bool = false
@@ -16,7 +20,8 @@ var is_active : bool = false
 func _init() -> void:
 	if Engine.is_editor_hint():
 		resource_local_to_scene = true
-		id = generate_scene_unique_id()
+		if id.is_empty():
+			id = generate_scene_unique_id()
 
 func _initialize(in_state : WState):
 	state = in_state
@@ -45,4 +50,4 @@ func _fail():
 
 func _complete(success : bool):
 	_end()
-	on_task_complete.emit(self, success)
+	on_task_complete.emit.call_deferred(self, success, trigger_state_completion)

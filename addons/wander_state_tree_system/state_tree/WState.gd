@@ -25,6 +25,7 @@ signal on_exited(state : WState)
 var dynamic_properties : Dictionary[StringName, Variant] = {}
 var is_active : bool = false
 var root : WState = null
+var default_context : Dictionary
 
 func _initialize(in_root_state : WState):
 	root = in_root_state
@@ -36,11 +37,15 @@ func _initialize(in_root_state : WState):
 		child_state.on_recursive_selection.connect(_handle_recursive_selection)
 		child_state._initialize(root)
 	in_root_state.on_event.connect(_handle_event)
+	default_context = create_new_context()
 
 func _process_state(delta: float):
 	for task in tasks:
 		task._process_task(delta)
-	var context := create_new_context()
+
+func _physics_process_state(delta : float):
+	for task in tasks:
+		task._physics_process_task(delta)
 	for transition in transitions:
 		if transition.is_pending():
 			if transition.decrement_pending_time(delta):
@@ -49,19 +54,14 @@ func _process_state(delta: float):
 			continue
 		if not transition.check_tick_trigger():
 			continue
-		if _try_transition(transition, context):
+		if _try_transition(transition, default_context):
 			if not transition.has_delay():
 				break
-
-func _physics_process_state(delta : float):
-	for task in tasks:
-		task._physics_process_task(delta)
 
 func _evaluate_entry()->bool:
 	if not enabled:
 		return false
-	var context := create_new_context()
-	return check_conditions(context, entry_conditions)
+	return check_conditions(default_context, entry_conditions)
 
 static func check_conditions(context : Dictionary, in_conditions : Array[WStateTreeCondition])->bool:
 	if in_conditions.size() == 0:
@@ -118,20 +118,19 @@ func _handle_event(event_tag : StringName, event_payload : Dictionary):
 		if transition.check_event_trigger(event_tag):
 			_try_transition(transition, event_payload)
 
-func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
-	if in_task.finish_state == false:
+func _handle_task_complete(in_task : WStateTreeTask, was_success : bool, complete : bool):
+	if not complete:
 		return
-	var context : Dictionary = create_new_context()
-	add_task_context(in_task, context)
-	var has_pending_transition : bool = false
+	add_task_context(in_task, default_context)
+	var has_transition : bool = false
 	for transition in transitions:
 		if transition.check_state_completion_trigger(was_success):
-			if _try_transition(transition, context):
-				if transition.has_delay():
-					has_pending_transition = true
-				else:
-					return
-	if not has_pending_transition:
+			if _try_transition(transition, default_context):
+				has_transition = true
+				if not transition.has_delay():
+					break
+	remove_task_context(default_context)
+	if not has_transition:
 		_default_transition()
 
 func _default_transition():
@@ -186,11 +185,10 @@ func search_children()->WState:
 	return self
 
 func search_transitions()->WState:
-	var context : Dictionary = create_new_context()
 	for transition in transitions:
 		if transition.trigger != transition.Trigger.ON_SEARCH:
 			continue
-		if not transition._evaluate_transition(context):
+		if not transition._evaluate_transition(default_context):
 			continue
 		var next_state : WState = transition.get_target_state()
 		return next_state._search()
@@ -245,6 +243,9 @@ static func get_state_context(context : Dictionary)->WState:
 
 static func add_task_context(task : WStateTreeTask, in_context : Dictionary):
 	in_context["task"] = task
+
+static func remove_task_context(in_context : Dictionary):
+	in_context.erase("task")
 
 static func get_task_context(context : Dictionary)->WStateTreeTask:
 	if context.has("task"):
