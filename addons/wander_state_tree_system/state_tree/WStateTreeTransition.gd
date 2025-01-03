@@ -26,6 +26,7 @@ enum Trigger {
 var state : WState = null
 var pending_time : float = 0
 
+
 func _get_property_list() -> Array[Dictionary]:
 	var ret : Array[Dictionary]
 	if Engine.is_editor_hint():
