@@ -10,7 +10,7 @@ extends WStateTreeTask
 func _init() -> void:
 	super()
 	if Engine.is_editor_hint():
-		trigger_state_completion = false
+		completion_policy = TaskCompletionPolicy.DO_NOTHING
 
 func _start():
 	super()

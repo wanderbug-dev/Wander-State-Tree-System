@@ -17,7 +17,9 @@ debug_message = "A1 Entered"
 debug_color = Color(0.83892, 0.420326, 0.867921, 1)
 id = &"ssne2"
 restart_on_reentry = false
-trigger_state_completion = false
+completion_policy = 2
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("4_ynr4i")
 
 [sub_resource type="Resource" id="Resource_mr867"]
@@ -26,7 +28,9 @@ script = ExtResource("5_hxel1")
 delay = 1.0
 id = &"B1WaitDelay"
 restart_on_reentry = false
-trigger_state_completion = true
+completion_policy = 0
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("5_hxel1")
 
 [sub_resource type="Resource" id="Resource_t5c5w"]
@@ -36,7 +40,9 @@ debug_message = "B1 Entered"
 debug_color = Color(0.315209, 0.802864, 1, 1)
 id = &"f6g5w"
 restart_on_reentry = false
-trigger_state_completion = false
+completion_policy = 2
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("4_ynr4i")
 
 [sub_resource type="Resource" id="Resource_ag4x0"]
@@ -56,7 +62,9 @@ debug_message = "C1 Entered"
 debug_color = Color(0.777922, 0.983838, 1, 1)
 id = &"c3dtf"
 restart_on_reentry = false
-trigger_state_completion = false
+completion_policy = 0
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("4_ynr4i")
 
 [sub_resource type="Resource" id="Resource_vos0y"]
@@ -85,7 +93,9 @@ script = ExtResource("5_hxel1")
 delay = 1.0
 id = &"1j3e8"
 restart_on_reentry = false
-trigger_state_completion = true
+completion_policy = 0
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("5_hxel1")
 
 [sub_resource type="Resource" id="Resource_4wcfn"]
@@ -95,7 +105,9 @@ debug_message = "B2 Entered"
 debug_color = Color(0.999997, 0.570794, 0.438447, 1)
 id = &"2s6ob"
 restart_on_reentry = false
-trigger_state_completion = false
+completion_policy = 2
+event_target = NodePath("")
+event_tag = &""
 metadata/_custom_type_script = ExtResource("4_ynr4i")
 
 [sub_resource type="Resource" id="Resource_5b20v"]

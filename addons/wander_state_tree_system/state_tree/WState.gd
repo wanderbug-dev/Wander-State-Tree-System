@@ -88,7 +88,7 @@ func _enter():
 		return
 	is_active = true
 	for task in tasks:
-		task.on_task_complete.connect(_handle_task_complete)
+		task.on_request_state_complete.connect(_handle_task_complete)
 		task._start()
 	on_entered.emit(self)
 
@@ -101,14 +101,14 @@ func _exit():
 		return
 	is_active = false
 	for task in tasks:
-		task.on_task_complete.disconnect(_handle_task_complete)
+		task.on_request_state_complete.disconnect(_handle_task_complete)
 	for task in tasks:
 		task._end()
 	for transition in transitions:
 		transition.clear_pending()
 	on_exited.emit(self)
 
-func _event(event_tag : StringName, event_payload : Dictionary):
+func _event(event_tag : StringName, event_payload : Dictionary[StringName, Variant]):
 	add_state_context(self, event_payload)
 	_handle_event(event_tag, event_payload)
 	on_event.emit(event_tag, event_payload)
@@ -118,9 +118,7 @@ func _handle_event(event_tag : StringName, event_payload : Dictionary):
 		if transition.check_event_trigger(event_tag):
 			_try_transition(transition, event_payload)
 
-func _handle_task_complete(in_task : WStateTreeTask, was_success : bool, complete : bool):
-	if not complete:
-		return
+func _handle_task_complete(in_task : WStateTreeTask, was_success : bool):
 	add_task_context(in_task, default_context)
 	var has_transition : bool = false
 	for transition in transitions:
